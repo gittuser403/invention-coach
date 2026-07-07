@@ -14,6 +14,9 @@ export async function GET(request: Request) {
     if (!error) {
       return NextResponse.redirect(`${origin}${next}`)
     }
+    console.error('exchangeCodeForSession failed', error)
+  } else {
+    console.error('/auth/callback hit with no code param', request.url)
   }
 
   return NextResponse.redirect(`${origin}/login?error=Sign-in failed, please try again`)

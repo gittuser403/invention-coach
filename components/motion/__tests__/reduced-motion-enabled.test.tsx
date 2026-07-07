@@ -5,6 +5,7 @@ import RevealOnMount from '@/components/motion/RevealOnMount'
 import TypingDots from '@/components/motion/TypingDots'
 import CelebratePulse from '@/components/motion/CelebratePulse'
 import JourneyPath from '@/components/motion/JourneyPath'
+import AmbientBackground from '@/components/motion/AmbientBackground'
 
 // Actually verifies prefers-reduced-motion behavior (per the PRD's explicit
 // "verify with a manual check, not just a code comment" requirement) rather
@@ -71,5 +72,13 @@ describe('prefers-reduced-motion: reduce', () => {
     ])
     render(<JourneyPath statusByStage={statusByStage} />)
     expect(screen.getByRole('img', { name: /1 of 7 stages complete/i })).toBeInTheDocument()
+  })
+
+  it('AmbientBackground still renders its decorative shapes, just frozen (no drift)', () => {
+    render(<AmbientBackground />)
+    const container = screen.getByTestId('ambient-background')
+    // Purely decorative — hidden from assistive tech either way.
+    expect(container).toHaveAttribute('aria-hidden', 'true')
+    expect(screen.getAllByTestId('ambient-blob')).toHaveLength(2)
   })
 })

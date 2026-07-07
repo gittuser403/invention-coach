@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { useReducedMotion } from 'framer-motion'
 import RevealOnMount from '@/components/motion/RevealOnMount'
+import AmbientBackground from '@/components/motion/AmbientBackground'
 
 // Counterpart to reduced-motion-enabled.test.tsx — confirms the DEFAULT
 // (motion allowed) path still works and looks structurally different from
@@ -37,5 +38,10 @@ describe('prefers-reduced-motion: no-preference', () => {
     )
     expect(container.innerHTML).not.toBe('<p>hello</p>')
     expect(container.querySelector('p')).not.toBeNull()
+  })
+
+  it('AmbientBackground renders its decorative shapes with drift enabled', () => {
+    render(<AmbientBackground />)
+    expect(screen.getAllByTestId('ambient-blob')).toHaveLength(2)
   })
 })

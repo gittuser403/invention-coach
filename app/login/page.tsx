@@ -1,4 +1,4 @@
-import { signInWithGoogle, signInWithMagicLink } from '@/app/auth/actions'
+import { signInWithGoogle } from '@/app/auth/actions'
 
 export default async function LoginPage({
   searchParams,
@@ -53,35 +53,6 @@ export default async function LoginPage({
             />
           </svg>
           Continue with Google
-        </button>
-      </form>
-
-      <div className="flex items-center gap-3 text-xs text-stone-400">
-        <div className="h-px flex-1 bg-stone-200" />
-        or
-        <div className="h-px flex-1 bg-stone-200" />
-      </div>
-
-      <form action={signInWithMagicLink} className="flex flex-col gap-2">
-        <label htmlFor="email" className="text-sm font-medium text-stone-700">
-          Email
-        </label>
-        <input
-          id="email"
-          name="email"
-          type="email"
-          required
-          placeholder="you@school.edu"
-          className="min-h-[44px] rounded-md border border-stone-300 px-3 py-2 text-sm text-stone-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600"
-        />
-        <p className="text-xs text-stone-500">
-          For school Chromebook accounts or if you don&apos;t have a Google account.
-        </p>
-        <button
-          type="submit"
-          className="mt-1 min-h-[44px] w-full rounded-md bg-brand-700 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600"
-        >
-          Send sign-in link
         </button>
       </form>
     </main>

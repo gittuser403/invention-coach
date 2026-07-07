@@ -1,16 +1,18 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 import { shouldRedirectToLogin } from '@/lib/supabase/route-guard'
+import { getSupabaseEnv } from '@/lib/supabase/env'
 
 // Refreshes the Supabase session cookie on every request. Runs once per
 // navigation from proxy.ts (Next.js 16's renamed Middleware), so parallel
 // requests within the same navigation see an already-refreshed token.
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request })
+  const { url, anonKey } = getSupabaseEnv()
 
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    url,
+    anonKey,
     {
       cookies: {
         getAll() {

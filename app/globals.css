@@ -1,0 +1,68 @@
+@import "tailwindcss";
+
+/*
+  Design system for Invention Coach — deliberately not the generic
+  purple-gradient AI-startup look. Warm stone neutrals (not clinical white/
+  gray) + a deep teal brand color (growth, ideas) + amber for celebration/
+  completion moments (a lit lightbulb, not a garish confetti purple).
+*/
+:root {
+  --background: #fafaf9; /* stone-50 */
+  --foreground: #1c1917; /* stone-900 */
+
+  --brand-50: #f0fdfa;
+  --brand-100: #ccfbf1;
+  --brand-200: #99f6e4;
+  --brand-300: #5eead4;
+  --brand-400: #2dd4bf;
+  --brand-500: #14b8a6;
+  --brand-600: #0d9488;
+  --brand-700: #0f766e;
+  --brand-800: #115e59;
+  --brand-900: #134e4a;
+
+  --celebrate-400: #fbbf24;
+  --celebrate-500: #f59e0b;
+  --celebrate-600: #d97706;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  --color-brand-50: var(--brand-50);
+  --color-brand-100: var(--brand-100);
+  --color-brand-200: var(--brand-200);
+  --color-brand-300: var(--brand-300);
+  --color-brand-400: var(--brand-400);
+  --color-brand-500: var(--brand-500);
+  --color-brand-600: var(--brand-600);
+  --color-brand-700: var(--brand-700);
+  --color-brand-800: var(--brand-800);
+  --color-brand-900: var(--brand-900);
+
+  --color-celebrate-400: var(--celebrate-400);
+  --color-celebrate-500: var(--celebrate-500);
+  --color-celebrate-600: var(--celebrate-600);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+/* Respect prefers-reduced-motion globally as a hard floor — any animation
+   library (Framer Motion) still needs its own useReducedMotion() checks
+   for JS-driven transforms, but this catches plain CSS transitions too. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

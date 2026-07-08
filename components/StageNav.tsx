@@ -31,7 +31,7 @@ export default function StageNav({
             aria-current={isActive ? 'page' : undefined}
             aria-label={`Stage ${stage.number}: ${stage.title} (${STATUS_TEXT[status]})`}
             title={stage.title}
-            className={`flex h-11 w-11 items-center justify-center rounded-full border-2 text-sm font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600 ${
+            className={`flex h-11 w-11 items-center justify-center rounded-full border-2 text-sm font-medium shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600 ${
               isActive
                 ? 'border-brand-700 bg-brand-700 text-white'
                 : status === 'complete'

@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { STAGES, TOTAL_STAGES } from '@/lib/stages-config'
 import { computeStageProgress } from '@/lib/stage-progress'
 import JourneyPath from '@/components/motion/JourneyPath'
+import RevealOnMount from '@/components/motion/RevealOnMount'
 import type { StageRow } from '@/lib/supabase/types'
 
 const STATUS_LABEL: Record<string, string> = {
@@ -37,41 +38,47 @@ export default async function DashboardPage() {
 
   return (
     <main className="mx-auto max-w-2xl px-4 py-8 sm:py-10">
-      <h1 className="text-xl font-semibold text-stone-900 sm:text-2xl">
-        Stage {currentStage} of {TOTAL_STAGES}
-      </h1>
-      <p className="mt-1 text-sm text-stone-500">
-        {completedCount} of {TOTAL_STAGES} stages complete.
-      </p>
+      <RevealOnMount>
+        <h1 className="text-xl font-semibold text-stone-900 sm:text-2xl">
+          Stage {currentStage} of {TOTAL_STAGES}
+        </h1>
+        <p className="mt-1 text-sm text-stone-500">
+          {completedCount} of {TOTAL_STAGES} stages complete.
+        </p>
+      </RevealOnMount>
 
-      <div className="mt-6">
-        <JourneyPath statusByStage={statusByStage} />
-      </div>
+      <RevealOnMount delay={0.08}>
+        <div className="mt-6 rounded-xl border border-stone-200 bg-white p-4 shadow-sm sm:p-5">
+          <JourneyPath statusByStage={statusByStage} />
+        </div>
+      </RevealOnMount>
 
       <ol className="mt-6 flex flex-col gap-2 sm:mt-8">
-        {STAGES.map((stage) => {
+        {STAGES.map((stage, index) => {
           const status = statusByStage.get(stage.number) ?? 'not_started'
           return (
-            <li key={stage.number}>
-              <Link
-                href={`/stage/${stage.number}`}
-                className="flex min-h-[44px] items-center justify-between gap-3 rounded-lg border border-stone-200 bg-white px-4 py-3 transition-colors hover:border-brand-300 hover:bg-brand-50/40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600"
-              >
-                <span className="min-w-0">
-                  <span className="block text-sm font-medium text-stone-800">
-                    {stage.number}. {stage.title}
-                  </span>
-                  <span className="block truncate text-xs text-stone-500">
-                    {stage.artifactLabel}
-                  </span>
-                </span>
-                <span
-                  className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-medium ${STATUS_BADGE_CLASS[status]}`}
+            <RevealOnMount key={stage.number} delay={0.12 + index * 0.04}>
+              <li>
+                <Link
+                  href={`/stage/${stage.number}`}
+                  className="group flex min-h-[44px] items-center justify-between gap-3 rounded-lg border border-stone-200 bg-white px-4 py-3 shadow-sm transition-all hover:-translate-y-0.5 hover:border-brand-300 hover:bg-brand-50/40 hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600"
                 >
-                  {STATUS_LABEL[status]}
-                </span>
-              </Link>
-            </li>
+                  <span className="min-w-0">
+                    <span className="block text-sm font-medium text-stone-800">
+                      {stage.number}. {stage.title}
+                    </span>
+                    <span className="block truncate text-xs text-stone-500">
+                      {stage.artifactLabel}
+                    </span>
+                  </span>
+                  <span
+                    className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-medium transition-transform group-hover:scale-105 ${STATUS_BADGE_CLASS[status]}`}
+                  >
+                    {STATUS_LABEL[status]}
+                  </span>
+                </Link>
+              </li>
+            </RevealOnMount>
           )
         })}
       </ol>

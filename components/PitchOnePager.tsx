@@ -12,7 +12,7 @@ export default function PitchOnePager({
   studentName?: string | null
 }) {
   return (
-    <article className="space-y-5 rounded-lg border border-stone-200 bg-white p-5 sm:p-6">
+    <article className="space-y-5 rounded-xl border border-stone-200 bg-white p-5 shadow-sm sm:p-6">
       <header className="border-b border-stone-100 pb-4">
         <h2 className="text-xl font-semibold text-stone-900">
           {pitch.nameAndTagline || 'Untitled Invention'}

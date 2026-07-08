@@ -1,8 +1,33 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import { motion, useReducedMotion } from 'framer-motion'
 import TypingDots from '@/components/motion/TypingDots'
 import RevealOnMount from '@/components/motion/RevealOnMount'
+
+function CoachAvatar() {
+  return (
+    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-50" aria-hidden="true">
+      <svg viewBox="0 0 24 24" className="h-4 w-4 text-brand-700">
+        <path
+          fill="currentColor"
+          d="M12 2a7 7 0 0 0-4 12.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26A7 7 0 0 0 12 2Zm-2 17a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-.5h-4V19Z"
+        />
+      </svg>
+    </span>
+  )
+}
+
+function UserAvatar() {
+  return (
+    <span
+      className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-stone-700 text-[10px] font-medium text-white"
+      aria-hidden="true"
+    >
+      You
+    </span>
+  )
+}
 
 type ChatMessage = {
   role: 'user' | 'assistant'
@@ -32,6 +57,7 @@ export default function ChatPanel({
   const [liveStatus, setLiveStatus] = useState('')
   const scrollRef = useRef<HTMLDivElement>(null)
   const inputId = `chat-input-stage-${stageNumber}`
+  const shouldReduceMotion = useReducedMotion()
 
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -89,7 +115,7 @@ export default function ChatPanel({
   }
 
   return (
-    <div className="flex h-[28rem] flex-col rounded-lg border border-stone-200 bg-white">
+    <div className="flex h-[28rem] flex-col rounded-xl border border-stone-200 bg-white shadow-sm">
       <div aria-live="polite" className="sr-only">
         {liveStatus}
       </div>
@@ -103,14 +129,16 @@ export default function ChatPanel({
         {messages.map((m, i) => {
           const isLast = i === messages.length - 1
           const isWaitingForFirstToken = isStreaming && isLast && m.role === 'assistant' && !m.content
+          const isUser = m.role === 'user'
           return (
             <RevealOnMount key={i}>
-              <div className={m.role === 'user' ? 'text-right' : 'text-left'}>
+              <div className={`flex items-end gap-2 ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
+                {isUser ? <UserAvatar /> : <CoachAvatar />}
                 <span
-                  className={`inline-block max-w-[85%] rounded-2xl px-3.5 py-2 text-sm ${
-                    m.role === 'user'
-                      ? 'bg-brand-700 text-white'
-                      : 'bg-stone-100 text-stone-900'
+                  className={`inline-block max-w-[80%] px-3.5 py-2 text-sm ${
+                    isUser
+                      ? 'rounded-2xl rounded-br-sm bg-brand-700 text-white'
+                      : 'rounded-2xl rounded-bl-sm bg-stone-100 text-stone-900'
                   }`}
                 >
                   {isWaitingForFirstToken ? <TypingDots /> : m.content}
@@ -141,15 +169,17 @@ export default function ChatPanel({
           onChange={(e) => setInput(e.target.value)}
           disabled={isStreaming}
           placeholder="Type your response..."
-          className="min-h-[44px] flex-1 rounded-md border border-stone-300 px-3 py-2 text-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600"
+          className="min-h-[44px] flex-1 rounded-md border border-stone-300 px-3 py-2 text-sm transition-shadow focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600"
         />
-        <button
+        <motion.button
           type="submit"
           disabled={isStreaming || !input.trim()}
+          whileHover={shouldReduceMotion || isStreaming || !input.trim() ? undefined : { scale: 1.03 }}
+          whileTap={shouldReduceMotion || isStreaming || !input.trim() ? undefined : { scale: 0.97 }}
           className="min-h-[44px] rounded-md bg-brand-700 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-800 disabled:opacity-40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600"
         >
           Send
-        </button>
+        </motion.button>
       </form>
     </div>
   )

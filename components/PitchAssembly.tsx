@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { motion, useReducedMotion } from 'framer-motion'
 import { STAGES } from '@/lib/stages-config'
 import { isPitchReady, type CompiledPitch } from '@/lib/pitch/compile'
 import { getOrCreateShareLink, setShareSettings } from '@/app/pitch/actions'
@@ -16,6 +17,7 @@ export default function PitchAssembly({ pitch }: { pitch: CompiledPitch }) {
   const [shareError, setShareError] = useState<string | null>(null)
   const [loadingShare, setLoadingShare] = useState(false)
   const [copied, setCopied] = useState(false)
+  const shouldReduceMotion = useReducedMotion()
 
   const notReady = pitch.readiness.filter((r) => !r.ready)
   const ready = isPitchReady(pitch)
@@ -87,21 +89,25 @@ export default function PitchAssembly({ pitch }: { pitch: CompiledPitch }) {
       <PitchOnePager pitch={pitch} />
 
       <div className="flex flex-wrap items-center gap-3">
-        <a
+        <motion.a
           href="/api/pitch/pdf"
-          className="flex min-h-[44px] items-center rounded-md bg-brand-700 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600"
+          whileHover={shouldReduceMotion ? undefined : { scale: 1.02 }}
+          whileTap={shouldReduceMotion ? undefined : { scale: 0.98 }}
+          className="flex min-h-[44px] items-center rounded-md bg-brand-700 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-brand-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600"
         >
           Download PDF
-        </a>
+        </motion.a>
 
         {!share && (
-          <button
+          <motion.button
             onClick={handleGetShareLink}
             disabled={loadingShare}
-            className="min-h-[44px] rounded-md border border-stone-300 px-4 py-2 text-sm font-medium text-stone-800 transition-colors hover:bg-stone-50 disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600"
+            whileHover={shouldReduceMotion || loadingShare ? undefined : { scale: 1.02 }}
+            whileTap={shouldReduceMotion || loadingShare ? undefined : { scale: 0.98 }}
+            className="min-h-[44px] rounded-md border border-stone-300 px-4 py-2 text-sm font-medium text-stone-800 shadow-sm transition-colors hover:bg-stone-50 disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600"
           >
             {loadingShare ? 'Creating link...' : 'Get shareable link'}
-          </button>
+          </motion.button>
         )}
       </div>
 
@@ -112,7 +118,7 @@ export default function PitchAssembly({ pitch }: { pitch: CompiledPitch }) {
       )}
 
       {share && (
-        <div className="rounded-md border border-stone-200 bg-white p-4 text-sm">
+        <div className="rounded-xl border border-stone-200 bg-white p-4 text-sm shadow-sm">
           <p className="mb-2 font-medium text-stone-800">Share with a teacher or judge</p>
           {shareUrl && (
             <div className="mb-3 flex items-center gap-2">

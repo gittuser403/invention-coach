@@ -106,6 +106,14 @@ export async function POST(request: Request) {
     model: anthropic(COACH_MODEL),
     system: buildSystemPrompt(stageNumber),
     messages: modelMessages,
+    // Lets the coach ground the conversation in real, existing products —
+    // e.g. naming Whoop/Garmin/Apple Watch for a fitness-wearable idea —
+    // without ever answering FOR the student. Anthropic runs the search
+    // server-side; capped so one coaching turn can't spiral into a long
+    // research session.
+    tools: {
+      web_search: anthropic.tools.webSearch_20250305({ maxUses: 3 }),
+    },
     onChunk: async ({ chunk }) => {
       if (chunk.type !== 'text-delta') return
       buffer += chunk.text

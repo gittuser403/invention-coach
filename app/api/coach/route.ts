@@ -2,7 +2,7 @@ import { anthropic } from '@ai-sdk/anthropic'
 import { streamText, type ModelMessage } from 'ai'
 import { createClient } from '@/lib/supabase/server'
 import { checkCoachRateLimit } from '@/lib/rate-limit'
-import { buildSystemPrompt } from '@/lib/coaching/system-prompt'
+import { buildSystemPrompt, type StudentStageWork } from '@/lib/coaching/system-prompt'
 
 export const maxDuration = 30
 
@@ -60,12 +60,28 @@ export async function POST(request: Request) {
     streaming: false,
   })
 
-  const { data: historyRows } = await supabase
-    .from('messages')
-    .select('role, content')
-    .eq('user_id', user.id)
-    .eq('stage_number', stageNumber)
-    .order('created_at', { ascending: true })
+  // Chat history for this stage, plus every stage's saved artifact so the
+  // coach carries context across stages (their Stage 1 problem informs the
+  // Stage 5 mechanism conversation) without hauling in whole other-stage
+  // chat transcripts.
+  const [{ data: historyRows }, { data: stageRows }] = await Promise.all([
+    supabase
+      .from('messages')
+      .select('role, content')
+      .eq('user_id', user.id)
+      .eq('stage_number', stageNumber)
+      .order('created_at', { ascending: true }),
+    supabase
+      .from('stages')
+      .select('stage_number, status, artifact')
+      .eq('user_id', user.id),
+  ])
+
+  const studentWork: StudentStageWork[] = (stageRows ?? []).map((row) => ({
+    stageNumber: row.stage_number,
+    status: row.status,
+    artifactText: (row.artifact as { text?: string } | null)?.text ?? '',
+  }))
 
   const modelMessages: ModelMessage[] = (historyRows ?? []).map((row) => ({
     role: row.role as 'user' | 'assistant',
@@ -104,7 +120,7 @@ export async function POST(request: Request) {
 
   const result = streamText({
     model: anthropic(COACH_MODEL),
-    system: buildSystemPrompt(stageNumber),
+    system: buildSystemPrompt(stageNumber, studentWork),
     messages: modelMessages,
     // Lets the coach ground the conversation in real, existing products —
     // e.g. naming Whoop/Garmin/Apple Watch for a fitness-wearable idea —

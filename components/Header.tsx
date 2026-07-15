@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { createClient } from '@/lib/supabase/server'
-import { signOut } from '@/app/auth/actions'
+import SignOutControls from '@/components/SignOutControls'
 
 export default async function Header() {
   const supabase = await createClient()
@@ -27,16 +27,7 @@ export default async function Header() {
           <span className="text-brand-700">NextMinds</span> Invention Coach
         </span>
       </Link>
-      {user && (
-        <form action={signOut}>
-          <button
-            type="submit"
-            className="min-h-[36px] rounded-md px-3 text-xs font-medium text-stone-500 transition-colors hover:bg-stone-100 hover:text-stone-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600"
-          >
-            Sign out
-          </button>
-        </form>
-      )}
+      {user && <SignOutControls />}
     </header>
   )
 }

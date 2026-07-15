@@ -19,7 +19,12 @@ const STATUS_BADGE_CLASS: Record<string, string> = {
   complete: 'bg-brand-100 text-brand-700',
 }
 
-export default async function DashboardPage() {
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>
+}) {
+  const { error } = await searchParams
   const user = await verifyUser()
   const supabase = await createClient()
 
@@ -38,6 +43,11 @@ export default async function DashboardPage() {
 
   return (
     <main className="mx-auto max-w-2xl px-4 py-8 sm:py-10">
+      {error && (
+        <p role="alert" className="mb-4 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">
+          {error}
+        </p>
+      )}
       <RevealOnMount>
         <h1 className="text-xl font-semibold text-stone-900 sm:text-2xl">
           Stage {currentStage} of {TOTAL_STAGES}

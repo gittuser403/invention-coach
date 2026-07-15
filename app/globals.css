@@ -1,29 +1,30 @@
 @import "tailwindcss";
 
 /*
-  Design system for Invention Coach — deliberately not the generic
-  purple-gradient AI-startup look. Warm stone neutrals (not clinical white/
-  gray) + a deep teal brand color (growth, ideas) + amber for celebration/
-  completion moments (a lit lightbulb, not a garish confetti purple).
+  Design system for Invention Coach — anchored on the NextMinds brand
+  lockup (public/nextminds-icon.png). Warm stone neutrals (not clinical
+  white/gray) + the logo's deep navy-indigo as the brand color (brand-700
+  is the exact logo navy) + the logo's orange for celebration/completion
+  moments (celebrate-400 is the exact logo orange).
 */
 :root {
   --background: #fafaf9; /* stone-50 */
   --foreground: #1c1917; /* stone-900 */
 
-  --brand-50: #f0fdfa;
-  --brand-100: #ccfbf1;
-  --brand-200: #99f6e4;
-  --brand-300: #5eead4;
-  --brand-400: #2dd4bf;
-  --brand-500: #14b8a6;
-  --brand-600: #0d9488;
-  --brand-700: #0f766e;
-  --brand-800: #115e59;
-  --brand-900: #134e4a;
+  --brand-50: #eef2ff;
+  --brand-100: #e0e7ff;
+  --brand-200: #c7d2fe;
+  --brand-300: #a5b4fc;
+  --brand-400: #818cf8;
+  --brand-500: #6366f1;
+  --brand-600: #4c4aae;
+  --brand-700: #2f2d78; /* logo navy */
+  --brand-800: #262463;
+  --brand-900: #1e1c4f;
 
-  --celebrate-400: #fbbf24;
-  --celebrate-500: #f59e0b;
-  --celebrate-600: #d97706;
+  --celebrate-400: #f99e23; /* logo orange */
+  --celebrate-500: #e18a0e;
+  --celebrate-600: #b56d08;
 }
 
 @theme inline {

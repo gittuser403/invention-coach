@@ -120,7 +120,38 @@ const STAGE_SECTIONS: Record<number, StageSection> = {
   },
 }
 
-export function buildSystemPrompt(stageNumber: number): string {
+export type StudentStageWork = {
+  stageNumber: number
+  status: string
+  artifactText: string
+}
+
+// The student's saved work from every stage, injected so each stage's
+// conversation is grounded in what they've already built — the Stage 5
+// coach should know what problem (Stage 1) and concept (Stage 4) it's
+// helping them articulate a mechanism for. Context only: the hard rule
+// still forbids using it to write anything on their behalf.
+function buildStudentWorkSection(work: StudentStageWork[]): string | null {
+  const withContent = work
+    .filter((w) => w.artifactText.trim())
+    .sort((a, b) => a.stageNumber - b.stageNumber)
+
+  if (withContent.length === 0) return null
+
+  const lines = withContent.map(
+    (w) => `Stage ${w.stageNumber} (${w.status.replace('_', ' ')}): ${w.artifactText.trim()}`
+  )
+
+  return `The Student's Work So Far (their own words, saved from each stage):
+${lines.join('\n')}
+
+Use this to keep the conversation continuous across stages — reference their earlier reasoning, notice contradictions, and celebrate how the idea has evolved. Never rewrite or improve these artifacts for them.`
+}
+
+export function buildSystemPrompt(
+  stageNumber: number,
+  studentWork: StudentStageWork[] = []
+): string {
   const stage = STAGE_SECTIONS[stageNumber]
   if (!stage) {
     throw new Error(`Invalid stage number: ${stageNumber}`)
@@ -132,11 +163,14 @@ Coaching moves:
 ${stage.coachingMoves.map((m) => `- ${m}`).join('\n')}
 Artifact to help produce: ${stage.artifact}`
 
+  const studentWorkSection = buildStudentWorkSection(studentWork)
+
   return [
     CORE_IDENTITY_AND_RULE,
     WEB_RESEARCH_GUIDANCE,
     TONE_AND_STYLE,
     stageSection,
+    ...(studentWorkSection ? [studentWorkSection] : []),
     OFF_TRACK_RECOVERY_PATTERN,
     WHAT_THIS_PROMPT_MUST_NEVER_DO,
   ].join('\n\n---\n\n')

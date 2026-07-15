@@ -46,4 +46,33 @@ describe('buildSystemPrompt', () => {
     expect(() => buildSystemPrompt(0)).toThrow('Invalid stage number')
     expect(() => buildSystemPrompt(8)).toThrow('Invalid stage number')
   })
+
+  it('includes prior-stage artifacts when student work is provided', () => {
+    const prompt = buildSystemPrompt(5, [
+      { stageNumber: 1, status: 'complete', artifactText: 'Students lose focus during long study sessions.' },
+      { stageNumber: 4, status: 'in_progress', artifactText: 'A desk lamp that dims when you look away.' },
+    ])
+    expect(prompt).toContain("The Student's Work So Far")
+    expect(prompt).toContain('Stage 1 (complete): Students lose focus during long study sessions.')
+    expect(prompt).toContain('Stage 4 (in progress): A desk lamp that dims when you look away.')
+    expect(prompt).toContain('Never rewrite or improve these artifacts for them.')
+  })
+
+  it('omits the student-work section entirely when there are no artifacts with text', () => {
+    const withEmpty = buildSystemPrompt(3, [
+      { stageNumber: 1, status: 'in_progress', artifactText: '   ' },
+    ])
+    expect(withEmpty).not.toContain("The Student's Work So Far")
+    expect(withEmpty).toBe(buildSystemPrompt(3))
+  })
+
+  it('sorts student work by stage number regardless of input order', () => {
+    const prompt = buildSystemPrompt(7, [
+      { stageNumber: 3, status: 'complete', artifactText: 'three' },
+      { stageNumber: 1, status: 'complete', artifactText: 'one' },
+    ])
+    expect(prompt.indexOf('Stage 1 (complete): one')).toBeLessThan(
+      prompt.indexOf('Stage 3 (complete): three')
+    )
+  })
 })

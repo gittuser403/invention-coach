@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase/server'
 import { signOut } from '@/app/auth/actions'
 
@@ -14,15 +15,17 @@ export default async function Header() {
         href={user ? '/dashboard' : '/'}
         className="flex items-center gap-2 rounded-sm text-sm font-semibold text-stone-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600"
       >
-        <span className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-50">
-          <svg viewBox="0 0 24 24" className="h-4 w-4 text-brand-700" aria-hidden="true">
-            <path
-              fill="currentColor"
-              d="M12 2a7 7 0 0 0-4 12.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26A7 7 0 0 0 12 2Zm-2 17a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-.5h-4V19Z"
-            />
-          </svg>
+        <Image
+          src="/nextminds-icon.png"
+          alt=""
+          width={28}
+          height={28}
+          className="h-7 w-7 shrink-0"
+          priority
+        />
+        <span>
+          <span className="text-brand-700">NextMinds</span> Invention Coach
         </span>
-        Invention Coach
       </Link>
       {user && (
         <form action={signOut}>

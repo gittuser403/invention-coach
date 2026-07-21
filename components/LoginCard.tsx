@@ -2,7 +2,6 @@
 
 import { motion, useReducedMotion } from 'framer-motion'
 import { signInWithGoogle } from '@/app/auth/actions'
-import AmbientBackground from '@/components/motion/AmbientBackground'
 
 // Extracted from the login page (a Server Component reading searchParams)
 // so the entrance/hover animations can use Framer Motion, which needs a
@@ -34,12 +33,10 @@ export default function LoginCard({
         }
 
   return (
-    <main className="relative flex min-h-[calc(100vh-57px)] items-center justify-center overflow-hidden bg-stone-50 px-4 py-10">
-      <AmbientBackground />
-
+    <main className="flex min-h-[calc(100vh-57px)] items-center justify-center px-4 py-10">
       <motion.div
         {...cardMotion}
-        className="relative w-full max-w-sm rounded-2xl border border-stone-200 bg-white/90 p-8 shadow-[0_8px_30px_-12px_rgba(15,118,110,0.25)] backdrop-blur-sm"
+        className="relative w-full max-w-sm rounded-2xl border border-stone-200 bg-white/90 p-8 shadow-[0_8px_30px_-12px_rgba(47,45,120,0.25)] backdrop-blur-sm"
       >
         <motion.div {...itemMotion(0.05)} className="flex flex-col items-center text-center">
           <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-brand-50">

@@ -115,7 +115,8 @@ export default function ChatPanel({
   }
 
   return (
-    <div className="flex h-[28rem] flex-col rounded-xl border border-stone-200 bg-white shadow-sm">
+    <div className="flex h-[28rem] flex-col overflow-hidden rounded-xl border border-stone-200 bg-white shadow-sm">
+      <div className="h-1 shrink-0 bg-gradient-to-r from-brand-700 to-celebrate-400" aria-hidden="true" />
       <div aria-live="polite" className="sr-only">
         {liveStatus}
       </div>

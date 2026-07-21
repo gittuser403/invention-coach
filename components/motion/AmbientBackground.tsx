@@ -2,10 +2,11 @@
 
 import { motion, useReducedMotion } from 'framer-motion'
 
-// Soft, slow-drifting blurred shapes behind the login card — decorative
-// only (aria-hidden), never competing with content for attention. Frozen
-// in place (no drift) under prefers-reduced-motion rather than removed
-// entirely, so the visual warmth stays without the motion.
+// Soft, slow-drifting blurred shapes behind every page — decorative only
+// (aria-hidden), fixed to the viewport so the NextMinds navy/orange wash
+// stays visible while scrolling instead of just sitting behind the login
+// card. Frozen in place (no drift) under prefers-reduced-motion rather
+// than removed entirely, so the visual warmth stays without the motion.
 export default function AmbientBackground() {
   const shouldReduceMotion = useReducedMotion()
 
@@ -13,7 +14,7 @@ export default function AmbientBackground() {
     <div
       aria-hidden="true"
       data-testid="ambient-background"
-      className="pointer-events-none absolute inset-0 overflow-hidden"
+      className="pointer-events-none fixed inset-0 -z-10 overflow-hidden"
     >
       <motion.div
         data-testid="ambient-blob"

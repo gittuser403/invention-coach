@@ -17,6 +17,19 @@ const COACH_MODEL = 'claude-haiku-4-5'
 // whole turn.
 const FLUSH_INTERVAL_MS = 2000
 
+// Web search adds real latency (search + read results + compose a reply)
+// on top of the model call — abort cleanly well before the platform's own
+// maxDuration cutoff so we control the failure (a clear message) instead
+// of the platform silently killing the function mid-stream.
+const SOFT_TIMEOUT_MS = 20000
+
+// Shown whenever a turn fails with no text generated yet — without this,
+// a failure that happens before the first token streams (common when
+// search is slow) would flush an empty string as the "final" message and
+// render as a silent blank bubble with no visible error at all.
+const FALLBACK_ERROR_TEXT =
+  "Sorry, that took longer than expected and I couldn't finish my reply — please try sending that again."
+
 export async function POST(request: Request) {
   const supabase = await createClient()
   const {
@@ -118,6 +131,19 @@ export async function POST(request: Request) {
       .eq('id', assistantRowId)
   }
 
+  // Verified experimentally: aborting streamText's abortSignal does NOT
+  // reliably invoke onError or onFinish (the AI SDK just ends the stream
+  // silently), so the timeout must flush fallback text itself rather than
+  // relying on those callbacks to clean up after an abort.
+  let settled = false
+  const abortController = new AbortController()
+  const softTimeout = setTimeout(() => {
+    if (settled) return
+    settled = true
+    abortController.abort()
+    void flush(buffer || FALLBACK_ERROR_TEXT, false)
+  }, SOFT_TIMEOUT_MS)
+
   const result = streamText({
     model: anthropic(COACH_MODEL),
     system: buildSystemPrompt(stageNumber, studentWork),
@@ -125,11 +151,12 @@ export async function POST(request: Request) {
     // Lets the coach ground the conversation in real, existing products —
     // e.g. naming Whoop/Garmin/Apple Watch for a fitness-wearable idea —
     // without ever answering FOR the student. Anthropic runs the search
-    // server-side; capped so one coaching turn can't spiral into a long
-    // research session.
+    // server-side; a single search is enough for the 2-4 named examples
+    // the system prompt asks for, so this also bounds worst-case latency.
     tools: {
-      web_search: anthropic.tools.webSearch_20250305({ maxUses: 3 }),
+      web_search: anthropic.tools.webSearch_20250305({ maxUses: 1 }),
     },
+    abortSignal: abortController.signal,
     onChunk: async ({ chunk }) => {
       if (chunk.type !== 'text-delta') return
       buffer += chunk.text
@@ -140,13 +167,25 @@ export async function POST(request: Request) {
       }
     },
     onFinish: async ({ text }) => {
-      await flush(text, false)
+      if (settled) return
+      settled = true
+      clearTimeout(softTimeout)
+      // Guard against a legitimate-but-empty finish, not just errors —
+      // an empty final message would otherwise render as a silent blank
+      // bubble with no visible error.
+      await flush(text || FALLBACK_ERROR_TEXT, false)
     },
     onError: async ({ error }) => {
+      if (settled) return
+      settled = true
       // Partial content already flushed stays on the row (not silently
       // lost); mark it no-longer-streaming so the client stops waiting.
+      // If nothing had streamed yet (common when a slow search fails
+      // before the first token), fall back to visible error text instead
+      // of persisting an empty string as the "final" reply.
+      clearTimeout(softTimeout)
       console.error('Coaching stream error', error)
-      await flush(buffer, false)
+      await flush(buffer || FALLBACK_ERROR_TEXT, false)
     },
   })
 

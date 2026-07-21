@@ -93,17 +93,33 @@ export default function ChatPanel({
 
       const reader = res.body.getReader()
       const decoder = new TextDecoder()
+      let receivedAny = false
 
       for (;;) {
         const { done, value } = await reader.read()
         if (done) break
         const chunkText = decoder.decode(value, { stream: true })
+        if (chunkText) receivedAny = true
         setMessages((prev) => {
           const next = [...prev]
           const last = next[next.length - 1]
           next[next.length - 1] = { ...last, content: last.content + chunkText }
           return next
         })
+      }
+
+      if (!receivedAny) {
+        // The request completed without a network error, but the stream
+        // carried no text — e.g. a slow web search failed server-side
+        // before the first token generated. Replace the blank bubble with
+        // a visible error instead of leaving it silently empty.
+        const fallback = "That took longer than expected and I didn't get a reply — please try again."
+        setMessages((prev) => {
+          const next = [...prev]
+          next[next.length - 1] = { ...next[next.length - 1], content: fallback }
+          return next
+        })
+        setError(fallback)
       }
       setLiveStatus('Coach replied')
     } catch {

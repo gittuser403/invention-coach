@@ -68,7 +68,7 @@ async function getCoachResponse(stage: number, studentMessage: string): Promise<
     // Same tool config as app/api/coach/route.ts — the eval must exercise
     // the real runtime, not a stripped-down version of it.
     tools: {
-      web_search: anthropic.tools.webSearch_20250305({ maxUses: 3 }),
+      web_search: anthropic.tools.webSearch_20250305({ maxUses: 1 }),
     },
   })
   return text
